@@ -11,15 +11,6 @@
     
     
     <item>
-      <title></title>
-      <link>https://wyattpfeil.com/contact/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://wyattpfeil.com/contact/</guid>
-      <description>test123</description>
-    </item>
-    
-    <item>
       <title>About</title>
       <link>https://wyattpfeil.com/about/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
@@ -29,12 +20,13 @@
     </item>
     
     <item>
-      <title>Dotflash update 2.0</title>
-      <link>https://wyattpfeil.com/post/dotflash-update-2-0/</link>
+      <title>Contact</title>
+      <link>https://wyattpfeil.com/contact/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
-      <guid>https://wyattpfeil.com/post/dotflash-update-2-0/</guid>
-      <description>Dot Flash 2.0 is currently being developed! I am fixing bugs and glitches. Adding new select skin feature, and many more things.</description>
+      <guid>https://wyattpfeil.com/contact/</guid>
+      <description>Looking to contact me? Fill out the form below and I&amp;rsquo;ll get back to you as soon as possible.
+ /* Style all select, textareas and input types except color, radio, checkbox */ input:not([type=color]):not([type=radio]):not([type=checkbox]), select, textarea { width: 100%; /* Full width */ padding: 12px; /* Some padding */ border: 1px solid #ccc; /* Gray border */ border-radius: 4px; /* Rounded borders */ box-sizing: border-box; /* Make sure that padding and width stays in place */ margin-top: 6px; /* Add a top margin */ margin-bottom: 16px; /* Bottom margin */ } /* Style textarea elements */ textarea { resize: vertical /* Allow the user to vertically resize the textarea (not horizontally) */ } /* increase the size of the select element to match others */ select { height: 4em; } /* add some space between the radio options*/ input[type=radio] { margin-left: 10px; margin-right: 5px; } /* add some space between the checkbox options*/ input[type=checkbox] { margin-right: 10px; } /* Style the submit button with a specific background color etc */ button[type=submit] { background-color: #0d0d0d; color: white; padding: 12px 20px; border: none; border-radius: 4px; width: 90%; height: 50px; cursor: pointer; font-weight: bold; margin-left: 5%; margin-right: 5%; } /* When moving the mouse over the submit button, add a darker color */ button[type=submit]:hover { background-color: #1091A9; } /* Add a background color and some padding around the form */ .</description>
     </item>
     
     <item>
@@ -56,7 +48,7 @@ iPad
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://wyattpfeil.com/post/learntocode/</guid>
-      <description>LearnToCode</description>
+      <description>LearnToCode is a web app I developed in 2019 for the Pennsylvania State Media and Design Competition. The aim of the project was to create a simple tool that helped new developers of all ages learn the fundementals of programming. LearnToCode can be accessed here</description>
     </item>
     
     <item>
@@ -71,27 +63,12 @@ Bukkit Plugins  Vault PermissionsEx  Severs  titanmc.net Mineplex.com play.hivem
     </item>
     
     <item>
-      <title>Ski Resorts</title>
-      <link>https://wyattpfeil.com/post/ski-resorts/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://wyattpfeil.com/post/ski-resorts/</guid>
-      <description>Here are a few ski resort links.
-Bear Creek | Goto Website OnlineTrails Open: 0 Lifts Open: 0
-Blue Mountain | Goto Website OnlineTrails Open: 22 Lifts Open: 9
-Spring Mountain | Goto Website OnlineTrails Open: 1 Lifts Open: 2
-Shawnee | Goto Website OnlineTrails Open: 16 Lifts Open: 5
-Jack Frost Big Bolder | Goto Website OnlineJack Frost Trails Open: 13 Jack Frost Lifts Open: 11
-Big Boulder Trails Open: 8 Big Boulder Lifts Open: 6</description>
-    </item>
-    
-    <item>
       <title>TwoJs</title>
       <link>https://wyattpfeil.com/post/twojs/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://wyattpfeil.com/post/twojs/</guid>
-      <description>TwoJs</description>
+      <description>I developed the TwoJS Javascript framework to provide developers a simple tool that can be used to create professional and responsive webapps. The framework uses HTML5 Canvas to draw shapes, buttons, images, and many other components to the page. The TwoJS designer can be accessed here and the Github repo can be found here</description>
     </item>
     
   </channel>

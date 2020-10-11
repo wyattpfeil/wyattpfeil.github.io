@@ -3,11 +3,6 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
-    <loc>https://wyattpfeil.com/contact/</loc>
-    <priority>0</priority>
-  </url>
-  
-  <url>
     <loc>https://wyattpfeil.com/about/</loc>
   </url>
   
@@ -16,7 +11,7 @@
   </url>
   
   <url>
-    <loc>https://wyattpfeil.com/post/dotflash-update-2-0/</loc>
+    <loc>https://wyattpfeil.com/contact/</loc>
   </url>
   
   <url>
@@ -33,10 +28,6 @@
   
   <url>
     <loc>https://wyattpfeil.com/post/</loc>
-  </url>
-  
-  <url>
-    <loc>https://wyattpfeil.com/post/ski-resorts/</loc>
   </url>
   
   <url>

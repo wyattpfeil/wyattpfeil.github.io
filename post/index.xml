@@ -11,36 +11,12 @@
     
     
     <item>
-      <title>Dotflash update 2.0</title>
-      <link>https://wyattpfeil.com/post/dotflash-update-2-0/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://wyattpfeil.com/post/dotflash-update-2-0/</guid>
-      <description>Dot Flash 2.0 is currently being developed! I am fixing bugs and glitches. Adding new select skin feature, and many more things.</description>
-    </item>
-    
-    <item>
       <title>LearnToCode</title>
       <link>https://wyattpfeil.com/post/learntocode/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://wyattpfeil.com/post/learntocode/</guid>
-      <description>LearnToCode</description>
-    </item>
-    
-    <item>
-      <title>Ski Resorts</title>
-      <link>https://wyattpfeil.com/post/ski-resorts/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://wyattpfeil.com/post/ski-resorts/</guid>
-      <description>Here are a few ski resort links.
-Bear Creek | Goto Website OnlineTrails Open: 0 Lifts Open: 0
-Blue Mountain | Goto Website OnlineTrails Open: 22 Lifts Open: 9
-Spring Mountain | Goto Website OnlineTrails Open: 1 Lifts Open: 2
-Shawnee | Goto Website OnlineTrails Open: 16 Lifts Open: 5
-Jack Frost Big Bolder | Goto Website OnlineJack Frost Trails Open: 13 Jack Frost Lifts Open: 11
-Big Boulder Trails Open: 8 Big Boulder Lifts Open: 6</description>
+      <description>LearnToCode is a web app I developed in 2019 for the Pennsylvania State Media and Design Competition. The aim of the project was to create a simple tool that helped new developers of all ages learn the fundementals of programming. LearnToCode can be accessed here</description>
     </item>
     
     <item>
@@ -49,7 +25,7 @@ Big Boulder Trails Open: 8 Big Boulder Lifts Open: 6</description>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://wyattpfeil.com/post/twojs/</guid>
-      <description>TwoJs</description>
+      <description>I developed the TwoJS Javascript framework to provide developers a simple tool that can be used to create professional and responsive webapps. The framework uses HTML5 Canvas to draw shapes, buttons, images, and many other components to the page. The TwoJS designer can be accessed here and the Github repo can be found here</description>
     </item>
     
   </channel>
