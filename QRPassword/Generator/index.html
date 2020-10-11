@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://printjs-4de6.kxcdn.com/print.min.js"></script>
+<img id="qrcode" src="" alt="">
+<p>Enter the name of the website your QR code will be used for.</p>
+<input type="text" id="websiteName" value="">
+<p>Enter the password that you would like to be stored in the QR code.</p>
+<input type="text" id="websitePassword" value="">
+<button id="generateButton" onclick="generateCode()">Generate QR Code</button>
+<script>
+    function generateCode(){
+        var GenerateButton = document.getElementById("generateButton")
+        GenerateButton.innerText = "Generating..."
+        const url = "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=" + document.getElementById("websitePassword").value
+        const data = {
+            "frame_name": "bottom-frame",
+            "qr_code_text": "TestPass",
+            "image_format": "SVG",
+            "frame_color": "#000000",
+            "frame_text_color": "#ffffff",
+            "frame_icon_name": "url",
+            "frame_text": "Test Pass",
+        }
+        document.getElementById("qrcode").src = url
+        GenerateButton.innerText = "Generated!"
+        //document.getElementById("websiteName").value
+        printJS({printable: url, type: 'image', header: '<p>' + document.getElementById("websiteName").value + '</p>', headerStyle : 'font-weight: 20;'})
+    }
+</script>
