@@ -47,15 +47,51 @@
             background-position: 0 -100%, 0 0
         }
     }
+
+    .text-input {
+        background: #00000000;
+        border: none;
+        outline: none;
+        color: white;
+        bottom: 20px;
+        position: fixed;
+    }
 </style>
 
+<script>
+    setTimeout(function () {
+        document.querySelector("#text-input").style = "display: fixed;"
+        document.querySelector("#text-input").focus()
+    }, 10000)
+    function formSubmit() {
+        var Text = document.querySelector("#text-input").value
+
+        if (Text == "1058") {
+            alert("Code correct. You will automatically receive further instructions on 1/10/23. Good luck.")
+
+            fetch("https://QRHunt.luasploit.repl.co/completed")
+        } else {
+            alert("Code incorrect. Please try again.")
+        }
+    }
+</script>
+
 <body>
+    <iframe name="dummyframe" id="dummyframe" style="display: none;"></iframe>
+
     <div class="container">
         <span class="type" style="--n:172 ">Aidan.. You didn't really think I would make it this easy, did
             you? <br /><br />Your next clue is held by the
             one who you
             hate most. <br /><br /><br />Have fun :D
         </span>
+        <br />
+
+        <form action="" target="dummyframe" id="form-elem" onsubmit="formSubmit()" typ>
+            <input type="text" id="text-input" class="text-input" placeholder="Enter code"
+                style="display:none;" /><br />
+            <input type="submit" style="display:none" />
+        </form>
     </div>
 </body>
 
