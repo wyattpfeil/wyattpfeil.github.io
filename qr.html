@@ -1,0 +1,62 @@
+<html>
+
+<head>
+    <title>QR</title>
+</head>
+<style>
+    @import url(https://fonts.googleapis.com/css?family=Anonymous+Pro);
+
+    * {
+        font-size: 57px;
+        font-family: 'Anonymous Pro', monospace;
+    }
+
+    body {
+        background: #0b131a;
+        background-size: cover;
+        font-family: 'Trebuchet MS', sans-serif;
+        padding-top: 20px;
+        padding-left: 20px;
+
+        padding-right: 20px;
+    }
+
+    .type {
+        font-family: monospace;
+        color: #0000;
+        background:
+            linear-gradient(-90deg, #ffffff 5px, #0000 0) 10px 0,
+            linear-gradient(#ffffff 0 0) 0 0;
+        background-size: calc(var(--n)*1ch) 200%;
+        -webkit-background-clip: padding-box, text;
+        background-clip: padding-box, text;
+        background-repeat: no-repeat;
+        animation:
+            b .7s infinite steps(1),
+            t calc(var(--n)*.07s) steps(var(--n)) forwards;
+    }
+
+    @keyframes t {
+        from {
+            background-size: 0 200%
+        }
+    }
+
+    @keyframes b {
+        50% {
+            background-position: 0 -100%, 0 0
+        }
+    }
+</style>
+
+<body>
+    <div class="container">
+        <span class="type" style="--n:172 ">Aidan.. You didn't really think I would make it this easy, did
+            you? <br /><br />Your next clue is held by the
+            one who you
+            hate most. <br /><br /><br />Have fun :D
+        </span>
+    </div>
+</body>
+
+</html>
