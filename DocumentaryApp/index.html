@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Rubik+Bubbles&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/vs2015.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+
+    <title>Learn to Code</title>
+</head>
+<body>
+    <div id="homeScreen" class="inactive section">
+        <div class="top-bar">
+            <h1 class="section-title">Learn to Code</h1>
+        </div>
+        <div class="section-body">
+            <img src="./CodeIcon.svg" alt="">
+        </div>
+        <div class="section-bottom">
+            <div class="section-buttons">
+                <button class="button button-secondary" id="assessButton">Assess Your Skills</button>
+                <button class="button button-primary" id="learnButton">Learn</button>
+            </div>
+        </div>
+    </div>
+    <div id="assessmentScreen" class="inactive section">
+        <div class="top-bar">
+            <h1 class="section-title">Assessment</h1>
+        </div>
+        <div class="section-top">
+            <p class="top-text">
+                What is the output of the following line(s) of code?
+            </p>
+            <pre class="code-block"><code data-style="tokyo-night-dark" class="language-JavaScript">console.log("hello")</code></pre>
+        </div>
+        <div class="section-bottom">
+            <div class="section-buttons">
+                <button class="button button-option">2</button>
+                <button class="button button-option">11</button>
+                <button class="button button-option">"2"</button>
+                <button class="button button-primary">Next</button>
+            </div>
+        </div>
+    </div>
+    <div id="resultsScreen" class="inactive section">
+        <div class="top-bar">
+            <h1 class="section-title">Results</h1>
+        </div>
+        <div class="section-top">
+            <p class="top-text results-text">
+                15/15 Correct!
+            </p>
+        </div>
+        <div class="section-body">
+            <image src="PandaHappy.png"></image>
+        </div>
+        <div class="section-bottom">
+            <div class="section-buttons">
+                <button class="button button-primary">Next</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="learnScreen" class="inactive section">
+        <div class="top-bar">
+            <h1 class="section-title">Learn</h1>
+            <div class="progress-container">
+                <p class="bold-text learn-percent-indicator">100%</p>
+            </div>
+        </div>
+        <div class="section-top">
+            <pre class="code-block"><code data-style="tokyo-night-dark" class="language-JavaScript" id="learnScreenCodeText">console.log("hello")</code></pre>
+            <p class="top-text" id="learnScreenQuestionText">
+                The above code outputs
+            </p>
+            <p class="bold-text" id="learnScreenAnswerText">11</p>
+        </div>
+        <div class="section-bottom">
+            <div class="section-buttons">
+                <button class="button button-primary" id="learnScreenNextButton">Next</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="quizScreen" class="inactive section">
+        <div class="top-bar">
+            <h1 class="section-title">Quiz</h1>
+            <div class="progress-container">
+                <p class="bold-text learn-percent-indicator">100%</p>
+            </div>
+        </div>
+        <div class="section-top">
+            <p class="top-text" id="quizScreenQuestion">
+                What is the output of the following lines of code?
+            </p>
+
+            <pre class="code-block"><code data-style="tokyo-night-dark" class="language-JavaScript" id="quizScreenCodeText">console.log("hello")</code></pre>
+        </div>
+        <div class="section-bottom">
+            <div class="section-buttons">
+                <button class="button button-option" id="quizScreenAnswer1Text">2</button>
+                <button class="button button-option" id="quizScreenAnswer2Text">11</button>
+                <button class="button button-option" id="quizScreenAnswer3Text">"2"</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="correctIncorrectScreen" class="active section">
+        <div class="top-bar">
+            <h1 class="section-title" id="correctIncorrectText">Correct!</h1>
+            <div class="progress-container">
+                <p class="bold-text learn-percent-indicator">100%</p>
+            </div>
+        </div>
+        <div class="section-body">
+            <image src="PandaHappy.png" id="correctIncorrectPandaImage"></image>
+            <p class="top-text" id="correctIncorrectScreenText">
+                Great job! You got it!
+            </p>
+        </div>
+        <div class="section-bottom">
+            <div class="section-buttons">
+                <button class="button button-primary" id="correctIncorrectNextButton">Next</button>
+            </div>
+        </div>
+    </div>
+</body> 
+    <script src="https://code.jquery.com/jquery-3.7.1.slim.js" integrity="sha256-UgvvN8vBkgO0luPSUl2s8TIlOSYRoGFAX4jlCIm9Adc=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/go.min.js"></script>
+    <script>hljs.configure({languages: "JavaScript"}); hljs.highlightAll();</script>
+    <script src="index.js"></script>
+</html>
