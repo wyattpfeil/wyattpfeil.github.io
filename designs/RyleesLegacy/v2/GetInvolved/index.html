@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Design</title>
+    <style>
+        body {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: start;
+            align-items: center;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        };
+        
+        #design {
+            width: 1920px;
+        }
+
+        #warning {
+            font-weight: 500;
+            color: #10375C;
+            font-size: 36px;
+            display: none;;
+        }
+
+        @media only screen and (max-width: 1200px) {
+            #design {
+                display: none;
+            }
+
+            #warning {
+                display: flex;
+                max-width: 300px;
+                align-items: flex-start;
+                justify-content: center;
+                text-align: left;
+                flex-direction: column;
+                gap: 30px;
+                height: 100vh;
+            }
+
+            #warning-text {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+            }
+            #warning-title {
+                font-size: 36px;
+            }
+
+            #warning-description {
+                font-size: 16px;
+                font-weight: 400;
+            }
+
+            #oh-no-image {
+                border-radius: 20px;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <img src="./Design.png" id="design" width="1920px" alt="" draggable="false">
+    <div id="warning">
+        <div id="warning-text">
+            <div id="warning-title">Oh no!</div>
+            <div id="warning-description">This design is best viewed on a larger screen. Try increasing your window size or moving to a larger screen.</div>
+        </div>
+        
+        <img src="./ohno.jpg" alt="" id="oh-no-image">
+    </div>
+</body>
+</html>
