@@ -1,0 +1,1634 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Car Wash Tycoon Sandbox</title>
+<style>
+  :root{
+    --bg1:#b7f3ff;
+    --bg2:#ffd5f7;
+    --bg3:#fff6b3;
+
+    --card: rgba(255,255,255,0.82);
+    --card2: rgba(255,255,255,0.70);
+    --stroke: rgba(30, 41, 59, 0.14);
+
+    --text:#0f172a;
+    --muted:#334155;
+
+    --good:#22c55e;
+    --warn:#f59e0b;
+    --bad:#ef4444;
+
+    --shadow: 0 18px 40px rgba(2,6,23,0.18);
+    --shadow2: 0 10px 22px rgba(2,6,23,0.12);
+
+    --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    --sans: ui-rounded, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+  }
+
+  html,body{
+    height:100%;
+    margin:0;
+    font-family:var(--sans);
+    color:var(--text);
+    background: white;
+  }
+
+  #game{position:fixed; inset:0; display:flex; flex-direction:column;}
+
+  /* top HUD */
+  #topHud{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    padding:12px 14px;
+    border-bottom: 2px solid rgba(15,23,42,0.08);
+    background: rgba(255,255,255,0.65);
+    backdrop-filter: blur(10px);
+  }
+
+  .hudLeft,.hudRight{display:flex; align-items:center; gap:10px; flex-wrap:wrap;}
+
+  .chip{
+    border:2px solid rgba(15,23,42,0.10);
+    background: rgba(255,255,255,0.75);
+    border-radius:999px;
+    padding:7px 12px;
+    font-size:12px;
+    display:flex;
+    gap:8px;
+    align-items:baseline;
+    box-shadow: 0 6px 14px rgba(2,6,23,0.08);
+  }
+  .chip .k{color:rgba(15,23,42,0.65); font-size:11px; font-weight:700;}
+  .chip .v{font-family:var(--mono); font-weight:900;}
+
+  .btn{
+    border:2px solid rgba(15,23,42,0.12);
+    background: rgba(255,255,255,0.75);
+    color:var(--text);
+    padding:8px 12px;
+    border-radius:999px;
+    cursor:pointer;
+    font-size:12px;
+    font-weight:900;
+    box-shadow: 0 8px 18px rgba(2,6,23,0.10);
+    user-select:none;
+    transform: translateY(0);
+    transition: transform 0.06s ease, filter 0.12s ease, background 0.12s ease;
+  }
+  .btn:hover{filter: brightness(1.03);}
+  .btn:active{transform: translateY(1px);}
+
+  .btn.small{padding:7px 10px; font-size:11px;}
+  .btn.primary{
+    border-color: rgba(34,197,94,0.32);
+    background: linear-gradient(180deg, rgba(34,197,94,0.28), rgba(34,197,94,0.10));
+  }
+  .btn.danger{
+    border-color: rgba(239,68,68,0.28);
+    background: linear-gradient(180deg, rgba(239,68,68,0.22), rgba(239,68,68,0.08));
+  }
+
+  #worldWrap{position:relative; flex:1; min-height:0;}
+  #world{position:absolute; inset:0; width:100%; height:100%; display:block;}
+
+  #hintBar{
+    position:absolute; left:14px; bottom:14px;
+    max-width:min(780px, 92vw);
+    border:2px solid rgba(15,23,42,0.10);
+    background: rgba(255,255,255,0.78);
+    border-radius:18px;
+    padding:12px 14px;
+    font-size:12px;
+    color:rgba(15,23,42,0.78);
+    box-shadow: var(--shadow2);
+    backdrop-filter: blur(10px);
+  }
+  #hintBar b{color:var(--text);}
+
+  #buildBar{
+    position:absolute; left:50%; transform:translateX(-50%);
+    bottom:14px;
+    display:flex; gap:10px; align-items:flex-end; flex-wrap:wrap;
+    border:2px solid rgba(15,23,42,0.10);
+    background: rgba(255,255,255,0.72);
+    border-radius:22px;
+    padding:12px 12px;
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(10px);
+  }
+
+  .palette{display:flex; gap:8px; align-items:center; flex-wrap:wrap;}
+  .palette .title{
+    font-size:11px; color:rgba(15,23,42,0.65);
+    margin-right:4px; font-weight:900;
+  }
+
+  .pill{
+    border:2px solid rgba(15,23,42,0.10);
+    background: rgba(255,255,255,0.78);
+    border-radius:999px;
+    padding:7px 12px;
+    font-size:12px;
+    cursor:pointer;
+    user-select:none;
+    white-space:nowrap;
+    font-weight:900;
+    box-shadow: 0 7px 16px rgba(2,6,23,0.10);
+    transition: transform 0.06s ease, filter 0.12s ease;
+  }
+  .pill:hover{filter: brightness(1.03);}
+  .pill:active{transform: translateY(1px);}
+  .pill.active{
+    outline: 3px solid rgba(59,130,246,0.35);
+    background: linear-gradient(180deg, rgba(59,130,246,0.22), rgba(59,130,246,0.08));
+  }
+  .pill .sub{
+    color:rgba(15,23,42,0.62);
+    font-size:11px;
+    margin-left:8px;
+    font-family:var(--mono);
+    font-weight:800;
+  }
+
+  #floatingPanel{
+    position:absolute; right:14px; top:14px; width:min(400px, 92vw);
+    border:2px solid rgba(15,23,42,0.10);
+    background: rgba(255,255,255,0.78);
+    border-radius:22px;
+    padding:14px;
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(12px);
+    display:none;
+  }
+
+  #floatingPanel .hd{
+    display:flex; align-items:flex-start; justify-content:space-between; gap:10px;
+    margin-bottom:10px;
+  }
+  #floatingPanel .hd .t{font-weight:1000; font-size:14px;}
+  #floatingPanel .sec{
+    border-top:2px dashed rgba(15,23,42,0.14);
+    padding-top:12px; margin-top:12px;
+  }
+
+  .row{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+
+  .field{
+    border:2px solid rgba(15,23,42,0.10);
+    background: rgba(255,255,255,0.72);
+    border-radius:18px;
+    padding:12px;
+    box-shadow: 0 8px 18px rgba(2,6,23,0.08);
+  }
+  .field label{display:block; font-size:11px; color:rgba(15,23,42,0.62); margin-bottom:6px; font-weight:900;}
+  .field input, .field select, textarea{
+    width:100%;
+    box-sizing:border-box;
+    border-radius:14px;
+    border:2px solid rgba(15,23,42,0.12);
+    background: rgba(255,255,255,0.88);
+    color:var(--text);
+    padding:9px 10px;
+    font-size:12px;
+    outline:none;
+    font-family:var(--mono);
+    font-weight:800;
+  }
+
+  #btnBuild {
+    background: rgb(255, 204, 0);
+  }
+
+  textarea{min-height:120px; resize:vertical;}
+
+  .list{display:flex; flex-direction:column; gap:10px;}
+
+  .item{
+    border:2px solid rgba(15,23,42,0.10);
+    background: rgba(255,255,255,0.76);
+    border-radius:18px;
+    padding:12px;
+    display:flex; align-items:flex-start; justify-content:space-between; gap:10px;
+    box-shadow: 0 10px 20px rgba(2,6,23,0.08);
+  }
+  .item .name{font-weight:1000; font-size:12px;}
+  .item .meta{font-size:11px; color:rgba(15,23,42,0.62); font-family:var(--mono); margin-top:5px; font-weight:800;}
+  .item .actions{display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end;}
+
+  .smallMuted{font-size:11px; color:rgba(15,23,42,0.65); line-height:1.35; font-weight:800;}
+
+  #devDrawer{
+    position:absolute; left:14px; top:14px;
+    width:min(540px, 94vw);
+    max-height:calc(100% - 96px);
+    border:2px solid rgba(15,23,42,0.10);
+    background: rgba(255,255,255,0.82);
+    border-radius:22px;
+    padding:14px;
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(12px);
+    overflow:auto;
+    display:none;
+  }
+  #devDrawer .hd{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    position:sticky; top:0;
+    padding-bottom:12px;
+    background: rgba(255,255,255,0.82);
+    border-bottom:2px dashed rgba(15,23,42,0.14);
+    margin:-14px; padding:14px;
+    border-top-left-radius:22px; border-top-right-radius:22px;
+    z-index:2;
+  }
+
+  .tag{font-family:var(--mono); font-size:11px; color:rgba(15,23,42,0.62); font-weight:900;}
+  .good{color:var(--good)} .warn{color:var(--warn)} .bad{color:var(--bad)}
+</style>
+
+</head>
+
+<body>
+<div id="game">
+  <div id="topHud">
+    <div class="hudLeft">
+      <button class="btn primary" id="btnPlay">Play</button>
+      <button class="btn" id="btnPause">Pause</button>
+      <button class="btn danger" id="btnReset">Reset</button>
+
+      <div class="chip"><span class="k">Cash</span><span class="v" id="hudCash">$0</span></div>
+      <div class="chip"><span class="k">$/min</span><span class="v" id="hudDpm">$0</span></div>
+      <div class="chip"><span class="k">Arrivals</span><span class="v" id="hudLam">0.00/s</span></div>
+      <div class="chip"><span class="k">Queue</span><span class="v" id="hudQueue">0/0</span></div>
+      <div class="chip"><span class="k">TipMult</span><span class="v" id="hudTipMult">1.00×</span></div>
+    </div>
+
+    <div class="hudRight">
+      <button class="btn" id="btnBuild">Build (ADVERTISEMENTS!)</button>
+      <button class="btn" id="btnClearBuild">Cancel Build</button>
+      <button class="btn" id="btnDev">Dev</button>
+      <span class="tag" id="hudTime">t=0.0s</span>
+    </div>
+  </div>
+
+  <div id="worldWrap">
+    <canvas id="world" width="1600" height="900"></canvas>
+
+    <div id="hintBar">
+      <b>Click</b> a lane to manage it. Use <b>Build</b> to place Ads and Tip Boosters on the plot grid.
+      Press <b>`</b> to toggle Dev panel.
+    </div>
+
+    <div id="buildBar" style="display:none;">
+      <div class="palette">
+        <span class="title">Build:</span>
+        <span class="pill" id="buildNone">None</span>
+      </div>
+      <div class="palette" id="buildAds"></div>
+      <div class="palette" id="buildBoosters"></div>
+      <div class="palette">
+        <span class="title">Tools:</span>
+        <button class="btn small" id="btnDeleteMode">Delete: OFF</button>
+      </div>
+    </div>
+
+    <div id="floatingPanel"></div>
+
+    <div id="devDrawer">
+      <div class="hd">
+        <div>
+          <div style="font-weight:900;">Dev / Tuning</div>
+          <div class="smallMuted">This is the “numbers sandbox” stuff — keep it hidden while you play.</div>
+        </div>
+        <div class="actions">
+          <button class="btn small" id="btnDevClose">Close</button>
+        </div>
+      </div>
+
+      <div class="field" style="margin-top:10px;">
+        <label>Sim Speed (x)</label>
+        <input id="simSpeed" type="number" min="1" step="1" value="5"/>
+      </div>
+
+      <div class="row" style="margin-top:10px;">
+        <div class="field">
+          <label>Tick (ms)</label>
+          <input id="tickMs" type="number" min="20" max="500" step="10" value="100"/>
+        </div>
+        <div class="field">
+          <label>Arrival Mode</label>
+          <select id="arrivalMode">
+            <option value="fixed">Fixed Timer</option>
+            <option value="jitter">Jittered Timer</option>
+            <option value="poisson">Poisson (bursty)</option>
+            <option value="smoothed">Smoothed Random</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:10px;">
+        <div class="field">
+          <label>Base Arrival (cars/sec)</label>
+          <input id="baseArrival" type="number" min="0" step="0.0001" value="0.0767"/>
+        </div>
+        <div class="field">
+          <label>Queue Capacity (cars)</label>
+          <input id="queueCap" type="number" min="0" step="1" value="12"/>
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:10px;">
+        <div class="field">
+          <label>Base Cleanliness</label>
+          <input id="baseClean" type="number" min="0" step="1" value="0"/>
+        </div>
+        <div class="field">
+          <label>Tip Chance (0..1)</label>
+          <input id="tipChance" type="number" min="0" max="1" step="0.01" value="0.15"/>
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:10px;">
+        <div class="field">
+          <label>Tip Rate</label>
+          <input id="tipRate" type="number" min="0" step="0.01" value="0.10"/>
+        </div>
+        <div class="field">
+          <label>Booster Limit</label>
+          <input id="boosterLimit" type="number" min="0" step="1" value="12"/>
+        </div>
+      </div>
+
+      <div class="sec">
+        <div style="font-weight:900; margin-bottom:8px;">Machine Tuning</div>
+        <div id="devMachines" class="list"></div>
+      </div>
+
+      <div class="sec">
+        <div style="font-weight:900; margin-bottom:8px;">Ads Tuning</div>
+        <div class="smallMuted">Build-mode placement uses these. Each placed ad adds to arrivals.</div>
+        <div id="devAds" class="list" style="margin-top:8px;"></div>
+      </div>
+
+      <div class="sec">
+        <div style="font-weight:900; margin-bottom:8px;">Boosters Tuning</div>
+        <div class="smallMuted">Placed boosters add to TipMult (additive). Booster limit enforced.</div>
+        <div id="devBoosters" class="list" style="margin-top:8px;"></div>
+      </div>
+
+      <div class="sec">
+        <div style="font-weight:900; margin-bottom:8px;">Config JSON</div>
+        <div class="actions" style="margin-bottom:8px;">
+          <button class="btn small" id="btnExport">Export</button>
+          <button class="btn small" id="btnImport">Import</button>
+          <button class="btn small" id="btnSave">Save</button>
+          <button class="btn small" id="btnLoad">Load</button>
+        </div>
+        <textarea id="configBox" spellcheck="false"></textarea>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(() => {
+  // ========= Helpers =========
+  const el = (id) => document.getElementById(id);
+  const clamp = (v,a,b)=>Math.max(a,Math.min(b,v));
+  const now = ()=>performance.now();
+  const expRand = (mean) => -Math.log(1 - Math.random()) * mean;
+  const fmtMoney = (n) => {
+    if (!isFinite(n)) return "$∞";
+    const abs = Math.abs(n);
+    if (abs >= 1e9) return "$" + (n/1e9).toFixed(2) + "B";
+    if (abs >= 1e6) return "$" + (n/1e6).toFixed(2) + "M";
+    if (abs >= 1e3) return "$" + (n/1e3).toFixed(2) + "K";
+    return "$" + n.toFixed(0);
+  };
+  const carColor = (id)=>`hsl(${(id*47)%360} 70% 65%)`;
+
+  function nextInterArrival(lam, mode) {
+    if (lam <= 0) return Infinity;
+    const mean = 1 / lam;
+    if (mode === "poisson") return expRand(mean);
+    if (mode === "fixed") return mean;
+    if (mode === "jitter") return mean * (0.75 + 0.5*Math.random());
+    if (mode === "smoothed") {
+      const k = 4;
+      let s = 0;
+      for (let i=0;i<k;i++) s += expRand(mean / k);
+      return s;
+    }
+    return mean;
+  }
+
+  // ========= Default Config =========
+  const DEFAULT = {
+  "sim": { "speed": 5, "tickMs": 100 },
+  "demand": {
+    "baseArrival": 0.0817,
+    "queueCap": 6,
+    "baseClean": 0,
+    "arrivalMode": "jitter"
+  },
+  "ads": [
+    { "id": "sign", "name": "Road Sign", "addCarsPerSec": 0.02, "cost": 150 },
+    { "id": "bill", "name": "Billboard", "addCarsPerSec": 0.04, "cost": 450 },
+    { "id": "radio", "name": "Radio", "addCarsPerSec": 0.07, "cost": 1200 },
+    { "id": "tv", "name": "TV Spot", "addCarsPerSec": 0.12, "cost": 3500 }
+  ],
+  "tips": {
+    "chance": 0.12,
+    "rate": 0.08,
+    "boosterLimit": 12,
+    "boosters": [
+      { "id": "c", "tier": "Common", "name": "Tip Jar", "bonus": 0.5, "cost": 250 },
+      { "id": "r", "tier": "Rare", "name": "Neon Sign", "bonus": 1.0, "cost": 900 },
+      { "id": "e", "tier": "Epic", "name": "VIP Lounge", "bonus": 2.0, "cost": 2500 },
+      { "id": "l", "tier": "Legendary", "name": "Celebrity Billboard", "bonus": 4.0, "cost": 9000 },
+      { "id": "m", "tier": "Mythic", "name": "Hologram", "bonus": 8.0, "cost": 28000 }
+    ]
+  },
+  "machines": [
+    { "key": "Rinse", "addClean": 20, "cost": 150 },
+    { "key": "Soaper", "addClean": 25, "cost": 200 },
+    { "key": "Dryer", "addClean": 30, "cost": 250 },
+    { "key": "Scrubber", "addClean": 35, "cost": 300 },
+    { "key": "Wax", "addClean": 40, "cost": 500 },
+    { "key": "Shine", "addClean": 45, "cost": 700 }
+  ],
+  "lanes": [
+    {
+      "name": "Lane 1",
+      "carsPerMin": 5,
+      "machines": ["Rinse"]
+    }
+  ],
+  "economy": {
+    "startCash": 0,
+    "laneAddCost": 1400,
+    "laneAddCostScale": 1.55,
+    "speedUpgradeBase": 900,
+    "speedUpgradeScale": 1.28
+  }
+}
+
+  let cfg = structuredClone(DEFAULT);
+
+  // ========= World / Build State =========
+  const build = {
+    open:false,
+    selected:null, // {kind:"ad"/"booster", id:"..."}
+    deleteMode:false
+  };
+
+  const placed = []; // {kind:"ad"/"booster", id, x,y}  (grid coords)
+  // Note: lane/machines live in cfg.lanes
+
+  // ========= Simulation State =========
+  const state = {
+    running:false,
+    t:0,
+    nextArrivalT: Infinity,
+    carId:0,
+    queue:[],           // car objects
+    lanes:[],           // lane sim
+    cash:0,
+    cashClean:0,
+    cashTips:0,
+    served:0,
+    missed:0,
+    events:[],          // rolling
+    vizCars:new Map(),  // id -> {x,y,tx,ty,phase,laneIdx,color}
+  };
+
+  function totalArrivalRate() {
+    let lam = Number(cfg.demand.baseArrival)||0;
+    // add placed ads
+    for (const p of placed) {
+      if (p.kind === "ad") {
+        const a = cfg.ads.find(x=>x.id===p.id);
+        if (a) lam += Number(a.addCarsPerSec)||0;
+      }
+    }
+    return Math.max(0, lam);
+  }
+
+  function placedBoosterCount() {
+    return placed.filter(p=>p.kind==="booster").length;
+  }
+
+  function tipMult() {
+    let sum = 0;
+    const limit = Math.max(0, Number(cfg.tips.boosterLimit)||0);
+    let used = 0;
+    for (const p of placed) {
+      if (p.kind !== "booster") continue;
+      if (used >= limit) break;
+      const b = cfg.tips.boosters.find(x=>x.id===p.id);
+      if (!b) continue;
+      used++;
+      sum += Number(b.bonus)||0;
+    }
+    return 1.0 + sum;
+  }
+
+  function laneCleanliness(laneCfg) {
+    const base = Number(cfg.demand.baseClean)||0;
+    const map = new Map(cfg.machines.map(m=>[m.key, Number(m.addClean)||0]));
+    let add = 0;
+    for (const k of laneCfg.machines) add += (map.get(k)||0);
+    return Math.max(0, base + add);
+  }
+
+  function serviceTimeSec(cpm) {
+    cpm = Math.max(0.0001, Number(cpm)||0.0001);
+    return 60 / cpm;
+  }
+
+  function dollarsPerMin(windowSec=60) {
+    const cutoff = state.t - windowSec;
+    let sum = 0;
+    for (let i=state.events.length-1; i>=0; i--) {
+      const e = state.events[i];
+      if (e.t < cutoff) break;
+      sum += e.earned;
+    }
+    return sum * (60 / windowSec);
+  }
+
+  function updateArrivalSchedule() {
+    const lam = totalArrivalRate();
+    if (lam <= 0) { state.nextArrivalT = Infinity; return; }
+    if (!isFinite(state.nextArrivalT)) {
+      state.nextArrivalT = state.t + nextInterArrival(lam, cfg.demand.arrivalMode);
+    }
+  }
+
+  // ========= Layout / Grid =========
+  const canvas = el("world");
+  const ctx = canvas.getContext("2d");
+
+  function resizeCanvas() {
+    const rect = canvas.getBoundingClientRect();
+    const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+    canvas.width = Math.floor(rect.width * dpr);
+    canvas.height = Math.floor(rect.height * dpr);
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+  }
+  window.addEventListener("resize", resizeCanvas);
+
+  function getLayout() {
+    const W = canvas.getBoundingClientRect().width;
+    const H = canvas.getBoundingClientRect().height;
+    const lanesN = Math.max(1, cfg.lanes.length);
+
+    const pad = 28;
+    const roadX0 = pad;
+    const roadX1 = 260;
+    const laneX0 = 300;
+    const laneX1 = W - 120;
+
+    const y0 = 90;
+    const y1 = H - 90;
+    const areaH = y1-y0;
+    const gap = 16;
+    const laneH = Math.max(54, (areaH - gap*(lanesN-1)) / lanesN);
+
+    const serviceX0 = laneX0 + 300;
+    const serviceX1 = serviceX0 + 260;
+
+    const exitX = W + 120;
+
+    const lanes = [];
+    for (let i=0; i<lanesN; i++) {
+      const ly0 = y0 + i*(laneH+gap);
+      const ly1 = ly0 + laneH;
+      const cy = (ly0+ly1)/2;
+      lanes.push({ y0:ly0, y1:ly1, cy, entryX: laneX0+25, serviceX0, serviceX1, exitX, exitY:cy });
+    }
+
+    // build grid in the “plot” region (right side)
+    const plotX0 = laneX0;
+    const plotY0 = y0 - 10;
+    const plotX1 = W - pad;
+    const plotY1 = y1 + 10;
+
+    const cell = 44;
+    const gx0 = plotX0;
+    const gy0 = plotY0;
+    const cols = Math.floor((plotX1 - plotX0) / cell);
+    const rows = Math.floor((plotY1 - plotY0) / cell);
+
+    return { W,H, roadX0,roadX1, laneX0,laneX1, y0,y1, lanes, serviceX0,serviceX1, exitX, plot:{gx0,gy0,cell,cols,rows,plotX1,plotY1} };
+  }
+
+  function screenToGrid(x,y,L) {
+    const {gx0,gy0,cell,cols,rows} = L.plot;
+    const gx = Math.floor((x - gx0) / cell);
+    const gy = Math.floor((y - gy0) / cell);
+    if (gx<0||gy<0||gx>=cols||gy>=rows) return null;
+    return {gx,gy};
+  }
+
+  function gridToScreenCenter(gx,gy,L) {
+    const {gx0,gy0,cell} = L.plot;
+    return { x: gx0 + gx*cell + cell/2, y: gy0 + gy*cell + cell/2 };
+  }
+
+  function placedAt(gx,gy) {
+    return placed.find(p=>p.x===gx && p.y===gy);
+  }
+
+  // ========= Cars / Visual =========
+  function ensureVizCar(car) {
+    if (state.vizCars.has(car.id)) return state.vizCars.get(car.id);
+    const L = getLayout();
+    const v = {
+      id: car.id,
+      x: L.roadX0 + 40,
+      y: L.y0,
+      tx: L.roadX0 + 40,
+      ty: L.y0,
+      phase: "queue",
+      laneIdx: null,
+      color: carColor(car.id),
+      wobble: (car.id % 1000) / 1000
+    };
+    state.vizCars.set(car.id, v);
+    return v;
+  }
+
+  function setTarget(v,x,y){ v.tx=x; v.ty=y; }
+  function moveToward(v, dt, spd){
+    const dx=v.tx-v.x, dy=v.ty-v.y;
+    const dist=Math.hypot(dx,dy);
+    if (dist < 0.5) { v.x=v.tx; v.y=v.ty; return true; }
+    const step = spd*dt;
+    const k = Math.min(1, step/dist);
+    v.x += dx*k; v.y += dy*k;
+    return false;
+  }
+
+  function cleanupVizCars(L) {
+    for (const [id,v] of state.vizCars.entries()) {
+      if (v.x > L.exitX + 200) state.vizCars.delete(id);
+    }
+  }
+
+  // ========= Simulation =========
+  function makeCar() {
+    const id = ++state.carId;
+    return { id, status:"queue", laneIdx:null };
+  }
+
+  function tick(dt) {
+    // arrivals
+    const lam = totalArrivalRate();
+    if (lam > 0 && !isFinite(state.nextArrivalT)) state.nextArrivalT = state.t + nextInterArrival(lam, cfg.demand.arrivalMode);
+
+    while (state.t >= state.nextArrivalT) {
+      const cap = Math.max(0, Math.floor(Number(cfg.demand.queueCap)||0));
+      if (state.queue.length < cap) {
+        const car = makeCar();
+        state.queue.push(car);
+        ensureVizCar(car);
+      } else {
+        state.missed++;
+        state.events.push({t:state.t, earned:0, served:0, missed:1});
+      }
+      state.nextArrivalT += nextInterArrival(lam, cfg.demand.arrivalMode);
+    }
+
+    // assign to free lanes
+    for (let i=0; i<state.lanes.length; i++) {
+      const lane = state.lanes[i];
+      if (!lane.inService && state.queue.length>0) {
+        const car = state.queue.shift();
+        car.status="toLane";
+        car.laneIdx=i;
+        lane.inService=car;
+        lane.remaining=serviceTimeSec(lane.carsPerMin);
+      }
+    }
+
+    // process lanes
+    for (let i=0; i<state.lanes.length; i++) {
+      const lane = state.lanes[i];
+      const car = lane.inService;
+      if (!car) continue;
+
+      lane.remaining -= dt;
+      lane.busyTime += dt;
+
+      if (car.status==="toLane" && lane.remaining < serviceTimeSec(lane.carsPerMin) - 0.10) {
+        car.status="inService";
+      }
+
+      if (lane.remaining <= 0) {
+        const laneCfg = cfg.lanes[i];
+        const clean = laneCleanliness(laneCfg);
+        const cleanCash = clean;
+
+        let tipCash = 0;
+        const chance = clamp(Number(cfg.tips.chance)||0, 0, 1);
+        if (Math.random() < chance && clean > 0) {
+          const rate = Math.max(0, Number(cfg.tips.rate)||0);
+          tipCash = clean * rate * tipMult();
+        }
+
+        const earned = cleanCash + tipCash;
+        state.cash += earned;
+        state.cashClean += cleanCash;
+        state.cashTips += tipCash;
+        state.served++;
+        lane.served++;
+
+        state.events.push({t:state.t, earned, served:1, missed:0});
+
+        car.status="exiting";
+        lane.inService=null;
+        lane.remaining=0;
+      }
+    }
+
+    // trim events
+    const windowMax = 10*60;
+    while (state.events.length && state.t - state.events[0].t > windowMax) state.events.shift();
+  }
+
+  function updateVizTargets(L) {
+    // queue positions: vertical
+    const cap = Math.max(0, Math.floor(Number(cfg.demand.queueCap)||0));
+    const qx = L.roadX1 - 40;
+    const qy0 = L.y0 - 10;
+    const step = 34;
+
+    for (let i=0;i<state.queue.length;i++){
+      const car = state.queue[i];
+      const v = ensureVizCar(car);
+      v.phase="queue";
+      v.laneIdx=null;
+      const y = qy0 + i*step;
+      setTarget(v, qx, y);
+    }
+
+    // active ids
+    const active = new Set();
+    for (const c of state.queue) active.add(c.id);
+    for (const lane of state.lanes) if (lane.inService) active.add(lane.inService.id);
+
+    // lane cars
+    for (let i=0;i<state.lanes.length;i++){
+      const lane = state.lanes[i];
+      const car = lane.inService;
+      if (!car) continue;
+      const v = ensureVizCar(car);
+      v.laneIdx=i;
+
+      const lay = L.lanes[i];
+      if (car.status==="toLane") {
+        v.phase="toLane";
+        setTarget(v, lay.entryX, lay.cy);
+      } else {
+        v.phase="inService";
+        setTarget(v, (lay.serviceX0+lay.serviceX1)/2, lay.cy);
+      }
+    }
+
+    // anything not active => exiting
+    for (const [id,v] of state.vizCars.entries()){
+      if (!active.has(id)) {
+        v.phase="exiting";
+        const li = v.laneIdx;
+        const y = (li!=null && L.lanes[li]) ? L.lanes[li].exitY : v.y;
+        setTarget(v, L.exitX+40, y);
+      }
+    }
+  }
+
+  function stepViz(dt, L) {
+    const base = 260;
+    const laneSpd = 360;
+    for (const v of state.vizCars.values()){
+      const spd = (v.phase==="queue") ? base : laneSpd;
+      moveToward(v, dt, spd);
+      if (v.phase==="inService") {
+        const wig = Math.sin((state.t*2) + v.wobble*10) * 0.5;
+        v.y += wig * dt * 10;
+      }
+    }
+    cleanupVizCars(L);
+  }
+
+  // ========= Render =========
+  function draw(L) {
+    const W = canvas.getBoundingClientRect().width;
+    const H = canvas.getBoundingClientRect().height;
+
+    ctx.clearRect(0,0,W,H);
+
+    // background grid subtle
+    ctx.strokeStyle = "rgba(0,0,0,0.05)";
+    for (let x=0;x<=W;x+=90){ ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
+    for (let y=0;y<=H;y+=90){ ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+
+    // road
+    ctx.fillStyle = "rgba(255,255,255,0.05)";
+    ctx.fillRect(L.roadX0, L.y0-30, (L.roadX1-L.roadX0), (L.y1-(L.y0-30))+40);
+    ctx.fillStyle = "rgba(0,0,0,0.65)";
+    ctx.font = "18px " + getComputedStyle(document.body).fontFamily;
+    ctx.fillText("ROAD / QUEUE", L.roadX0+10, L.y0-40);
+
+    // plot grid area
+    ctx.strokeStyle = "rgba(255,255,255,0.10)";
+    ctx.strokeRect(L.plot.gx0, L.plot.gy0, L.plot.cols*L.plot.cell, L.plot.rows*L.plot.cell);
+    ctx.fillStyle = "rgba(0,0,0,0.55)";
+    ctx.font = "18px " + getComputedStyle(document.body).fontFamily;
+    ctx.fillText("PLOT (build here)", L.plot.gx0+10, L.plot.gy0-12);
+
+    // grid lines
+    ctx.strokeStyle = "rgba(255,255,255,0.04)";
+    for (let gx=0; gx<=L.plot.cols; gx++){
+      const x = L.plot.gx0 + gx*L.plot.cell;
+      ctx.beginPath(); ctx.moveTo(x, L.plot.gy0); ctx.lineTo(x, L.plot.gy0 + L.plot.rows*L.plot.cell); ctx.stroke();
+    }
+    for (let gy=0; gy<=L.plot.rows; gy++){
+      const y = L.plot.gy0 + gy*L.plot.cell;
+      ctx.beginPath(); ctx.moveTo(L.plot.gx0, y); ctx.lineTo(L.plot.gx0 + L.plot.cols*L.plot.cell, y); ctx.stroke();
+    }
+
+    // lanes
+    for (let i=0;i<L.lanes.length;i++){
+      const lane = L.lanes[i];
+      const laneCfg = cfg.lanes[i];
+
+      // lane background
+      ctx.fillStyle = "rgba(255,255,255,0.04)";
+      ctx.fillRect(L.laneX0, lane.y0, (L.laneX1-L.laneX0), (lane.y1-lane.y0));
+      ctx.strokeStyle = "rgba(255,255,255,0.12)";
+      ctx.strokeRect(L.laneX0, lane.y0, (L.laneX1-L.laneX0), (lane.y1-lane.y0));
+
+      // service zone highlight
+      ctx.fillStyle = "rgba(74,222,128,0.10)";
+      ctx.fillRect(lane.serviceX0, lane.y0, (lane.serviceX1-lane.serviceX0), (lane.y1-lane.y0));
+      ctx.fillStyle = "rgba(0,0,0,0.60)";
+      ctx.font = "12px var(--mono)";
+      const clean = laneCleanliness(laneCfg).toFixed(0);
+      ctx.fillText(`Lane ${i+1} • ${Number(laneCfg.carsPerMin).toFixed(1)} cpm • clean=$${clean}`, L.laneX0+12, lane.y0+18);
+
+      // installed machine "nodes" (visual)
+      const machines = laneCfg.machines || [];
+      const nodes = Math.max(4, machines.length);
+      const nx0 = lane.serviceX0 + 10;
+      const nx1 = lane.serviceX1 - 10;
+      for (let j=0;j<nodes;j++){
+        const t = nodes<=1 ? 0.5 : j/(nodes-1);
+        const x = nx0 + t*(nx1-nx0);
+        const y = lane.cy;
+        ctx.fillStyle = "rgba(255,255,255,0.15)";
+        ctx.beginPath(); ctx.arc(x,y,6,0,Math.PI*2); ctx.fill();
+      }
+      // machine labels above
+      ctx.fillStyle = "rgba(0,0,0,0.55)";
+      ctx.font = "11px " + getComputedStyle(document.body).fontFamily;
+      if (machines.length) {
+        ctx.fillText(`Machines: ${machines.join(", ")}`, L.laneX0+12, lane.y0+36);
+      } else {
+        ctx.fillText(`Machines: (none)`, L.laneX0+12, lane.y0+36);
+      }
+    }
+
+    // placed objects
+    // placed objects (cute stickers)
+for (const p of placed) {
+  const c = gridToScreenCenter(p.x,p.y,L);
+  const isAd = p.kind==="ad";
+
+  // bubble shadow
+  ctx.fillStyle = "rgba(2,6,23,0.10)";
+  ctx.beginPath();
+  ctx.roundRect(c.x-18, c.y-15, 36, 34, 12);
+  ctx.fill();
+
+  // sticker
+  ctx.fillStyle = isAd ? "rgba(59,130,246,0.40)" : "rgba(168,85,247,0.35)";
+  ctx.strokeStyle = isAd ? "rgba(59,130,246,0.85)" : "rgba(168,85,247,0.85)";
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.roundRect(c.x-18, c.y-18, 36, 36, 14);
+  ctx.fill();
+  ctx.stroke();
+
+  // icon
+  ctx.fillStyle = "rgba(255,255,255,0.95)";
+  ctx.font = "bold 13px var(--mono)";
+  ctx.fillText(isAd ? "📣" : "💜", c.x-10, c.y+6);
+
+  // tiny tag
+  ctx.fillStyle = "rgba(15,23,42,0.75)";
+  ctx.font = "bold 10px var(--mono)";
+  ctx.fillText(p.id.toUpperCase(), c.x-13, c.y+18);
+}
+
+    // preview placement
+    if (build.open && build.selected) {
+      const mx = mouse.x, my = mouse.y;
+      const g = screenToGrid(mx,my,L);
+      if (g) {
+        const c = gridToScreenCenter(g.gx,g.gy,L);
+        ctx.strokeStyle = build.deleteMode ? "rgba(251,113,133,0.85)" : "rgba(74,222,128,0.85)";
+        ctx.setLineDash([6,6]);
+        ctx.strokeRect(c.x-18, c.y-18, 36, 36);
+        ctx.setLineDash([]);
+      }
+    }
+
+    // cars
+    // cars (toy look)
+for (const v of state.vizCars.values()){
+  const w = 30, h = 18;
+
+  // soft shadow
+  ctx.fillStyle="rgba(2,6,23,0.14)";
+  ctx.beginPath();
+  ctx.roundRect(v.x-w/2+2, v.y-h/2+3, w, h, 8);
+  ctx.fill();
+
+  // body
+  ctx.fillStyle=v.color;
+  ctx.beginPath();
+  ctx.roundRect(v.x-w/2, v.y-h/2, w, h, 8);
+  ctx.fill();
+
+  // window
+  ctx.fillStyle="rgba(255,255,255,0.35)";
+  ctx.beginPath();
+  ctx.roundRect(v.x-w/2+5, v.y-h/2+4, w-10, 6, 4);
+  ctx.fill();
+
+  // wheels
+  ctx.fillStyle="rgba(15,23,42,0.35)";
+  ctx.beginPath(); ctx.arc(v.x-w/2+6, v.y+h/2-2, 3, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(v.x+w/2-6, v.y+h/2-2, 3, 0, Math.PI*2); ctx.fill();
+}
+
+  }
+
+  // polyfill-ish for roundRect in older browsers
+  if (!CanvasRenderingContext2D.prototype.roundRect) {
+    CanvasRenderingContext2D.prototype.roundRect = function(x,y,w,h,r){
+      r = Math.min(r, w/2, h/2);
+      this.beginPath();
+      this.moveTo(x+r,y);
+      this.arcTo(x+w,y,x+w,y+h,r);
+      this.arcTo(x+w,y+h,x,y+h,r);
+      this.arcTo(x,y+h,x,y,r);
+      this.arcTo(x,y,x+w,y,r);
+      this.closePath();
+      return this;
+    };
+  }
+
+  // ========= UI: Build Palette =========
+  function openBuild(open) {
+    build.open = open;
+    el("buildBar").style.display = open ? "flex" : "none";
+    if (!open) {
+      build.selected = null;
+      build.deleteMode = false;
+      el("btnDeleteMode").textContent = "Delete: OFF";
+      setActiveBuildPill(null);
+    }
+  }
+
+  function setActiveBuildPill(key) {
+    // clear
+    document.querySelectorAll(".pill").forEach(p=>p.classList.remove("active"));
+    if (!key) return;
+    const node = document.querySelector(`[data-buildkey="${key}"]`);
+    if (node) node.classList.add("active");
+  }
+
+  function rebuildBuildBar() {
+    // Ads
+    const ads = el("buildAds");
+    ads.innerHTML = `<span class="title">Ads</span>`;
+    for (const a of cfg.ads) {
+      const b = document.createElement("span");
+      b.className = "pill";
+      b.dataset.buildkey = `ad:${a.id}`;
+      b.textContent = a.name;
+      const sub = document.createElement("span");
+      sub.className = "sub";
+      sub.textContent = `+${(a.addCarsPerSec*60).toFixed(1)}/min • $${a.cost}`;
+      b.appendChild(sub);
+      b.addEventListener("click", () => {
+        build.selected = {kind:"ad", id:a.id};
+        setActiveBuildPill(`ad:${a.id}`);
+      });
+      ads.appendChild(b);
+    }
+
+    // Boosters
+    const boosters = el("buildBoosters");
+    boosters.innerHTML = `<span class="title">Tip Boosters</span>`;
+    for (const b0 of cfg.tips.boosters) {
+      const b = document.createElement("span");
+      b.className = "pill";
+      b.dataset.buildkey = `booster:${b0.id}`;
+      b.textContent = b0.name;
+      const sub = document.createElement("span");
+      sub.className = "sub";
+      sub.textContent = `+${b0.bonus} • $${b0.cost}`;
+      b.appendChild(sub);
+      b.addEventListener("click", () => {
+        build.selected = {kind:"booster", id:b0.id};
+        setActiveBuildPill(`booster:${b0.id}`);
+      });
+      boosters.appendChild(b);
+    }
+
+    el("buildNone").dataset.buildkey = "none";
+    el("buildNone").addEventListener("click", ()=> {
+      build.selected = null;
+      setActiveBuildPill("none");
+    });
+  }
+
+  // ========= Lane Panel =========
+  let selectedLaneIdx = null;
+
+  function closeFloatingPanel() {
+    el("floatingPanel").style.display = "none";
+    selectedLaneIdx = null;
+  }
+
+  function speedUpgradeCost(currentCpm) {
+    const base = Number(cfg.economy.speedUpgradeBase)||400;
+    const scale = Number(cfg.economy.speedUpgradeScale)||1.18;
+    return Math.round(base * Math.pow(scale, Math.max(0, currentCpm - 1)));
+  }
+
+  function openLanePanel(idx) {
+    selectedLaneIdx = idx;
+    const laneCfg = cfg.lanes[idx];
+    const laneSim = state.lanes[idx];
+    const clean = laneCleanliness(laneCfg);
+    const st = serviceTimeSec(laneCfg.carsPerMin);
+
+    const used = new Set(laneCfg.machines);
+    const available = cfg.machines.filter(m=>!used.has(m.key));
+
+    const panel = el("floatingPanel");
+    panel.style.display = "block";
+    panel.innerHTML = `
+      <div class="hd">
+        <div>
+          <div class="t">Manage ${laneCfg.name || `Lane ${idx+1}`}</div>
+          <div class="smallMuted" style="margin-top:2px;">
+            Speed: <span class="tag">${Number(laneCfg.carsPerMin).toFixed(1)} cpm</span>
+            • Service: <span class="tag">${st.toFixed(1)}s</span>
+            • Clean payout: <span class="tag">$${clean.toFixed(0)}/car</span>
+          </div>
+        </div>
+        <button class="btn small" id="btnCloseLane">Close</button>
+      </div>
+
+      <div class="sec">
+        <div class="item">
+          <div>
+            <div class="name">Track Speed Upgrade</div>
+            <div class="meta">Increase +1.0 cars/min (only throughput lever)</div>
+          </div>
+          <div class="actions">
+            <button class="btn primary" id="btnSpeedUp">Upgrade (+1) • $${speedUpgradeCost(laneCfg.carsPerMin)}</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="sec">
+        <div style="font-weight:900; margin-bottom:8px;">Machines (unique per lane)</div>
+        <div class="list" id="installedMachines"></div>
+        <div style="height:10px;"></div>
+        <div style="font-weight:900; margin-bottom:8px;">Install a Machine</div>
+        <div class="list" id="availableMachines"></div>
+      </div>
+
+      <div class="sec">
+        <div class="item">
+          <div>
+            <div class="name">Add Lane</div>
+            <div class="meta">Build new lane to scale capacity when demand grows.</div>
+          </div>
+          <div class="actions">
+            <button class="btn" id="btnAddLaneGame">Add Lane • $${nextLaneCost()}</button>
+          </div>
+        </div>
+      </div>
+    `;
+
+    el("btnCloseLane").onclick = closeFloatingPanel;
+
+    // speed upgrade
+    el("btnSpeedUp").onclick = () => {
+      const cost = speedUpgradeCost(laneCfg.carsPerMin);
+      if (state.cash < cost) return flashHint(`Not enough cash. Need $${cost}.`);
+      state.cash -= cost;
+      laneCfg.carsPerMin = Number(laneCfg.carsPerMin) + 1;
+      if (state.lanes[idx]) state.lanes[idx].carsPerMin = laneCfg.carsPerMin;
+      flashHint(`Upgraded speed to ${laneCfg.carsPerMin.toFixed(1)} cpm.`);
+      openLanePanel(idx);
+      updateHud();
+    };
+
+    // installed machines list with remove (refund optional: 0 refund for now)
+    const installed = panel.querySelector("#installedMachines");
+    if (!laneCfg.machines.length) {
+      installed.innerHTML = `<div class="smallMuted">No machines installed yet.</div>`;
+    } else {
+      installed.innerHTML = "";
+      for (const key of laneCfg.machines) {
+        const m = cfg.machines.find(x=>x.key===key);
+        const div = document.createElement("div");
+        div.className = "item";
+        div.innerHTML = `
+          <div>
+            <div class="name">${key}</div>
+            <div class="meta">+${Number(m?.addClean||0).toFixed(0)} clean</div>
+          </div>
+          <div class="actions">
+            <button class="btn small danger" data-rm="${key}">Remove</button>
+          </div>
+        `;
+        div.querySelector("[data-rm]").onclick = () => {
+          // remove (no refund)
+          laneCfg.machines = laneCfg.machines.filter(k=>k!==key);
+          flashHint(`Removed ${key}.`);
+          openLanePanel(idx);
+        };
+        installed.appendChild(div);
+      }
+    }
+
+    // available machines list with BUY+INSTALL
+    const avail = panel.querySelector("#availableMachines");
+    if (!available.length) {
+      avail.innerHTML = `<div class="smallMuted">No more machine types available (unique constraint).</div>`;
+    } else {
+      avail.innerHTML = "";
+      for (const m of available) {
+        const div = document.createElement("div");
+        div.className = "item";
+        div.innerHTML = `
+          <div>
+            <div class="name">${m.key}</div>
+            <div class="meta">+${Number(m.addClean).toFixed(0)} clean • Cost $${Number(m.cost||0).toFixed(0)}</div>
+          </div>
+          <div class="actions">
+            <button class="btn primary" data-buy="${m.key}">Buy & Install</button>
+          </div>
+        `;
+        div.querySelector("[data-buy]").onclick = () => {
+          const cost = Math.max(0, Number(m.cost||0));
+          if (state.cash < cost) return flashHint(`Not enough cash. Need $${cost}.`);
+          state.cash -= cost;
+          laneCfg.machines.push(m.key);
+          flashHint(`Installed ${m.key} on Lane ${idx+1}.`);
+          openLanePanel(idx);
+          updateHud();
+        };
+        avail.appendChild(div);
+      }
+    }
+
+    // add lane
+    el("btnAddLaneGame").onclick = () => {
+      const cost = nextLaneCost();
+      if (state.cash < cost) return flashHint(`Not enough cash. Need $${cost}.`);
+      state.cash -= cost;
+      cfg.lanes.push({ name:`Lane ${cfg.lanes.length+1}`, carsPerMin: 5, machines: [] });
+      state.lanes.push({ id: state.lanes.length, carsPerMin: 5, inService:null, remaining:0, busyTime:0, served:0 });
+      flashHint(`Built Lane ${cfg.lanes.length}.`);
+      openLanePanel(cfg.lanes.length-1);
+      updateHud();
+    };
+  }
+
+  function nextLaneCost() {
+    const base = Number(cfg.economy.laneAddCost)||2500;
+    const scale = Number(cfg.economy.laneAddCostScale)||1.6;
+    const n = Math.max(0, cfg.lanes.length - 1); // lane2 is first purchase
+    return Math.round(base * Math.pow(scale, n));
+  }
+
+  // ========= Dev UI =========
+  function rebuildDev() {
+    el("simSpeed").value = cfg.sim.speed;
+    el("tickMs").value = cfg.sim.tickMs;
+    el("arrivalMode").value = cfg.demand.arrivalMode;
+
+    el("baseArrival").value = cfg.demand.baseArrival;
+    el("queueCap").value = cfg.demand.queueCap;
+    el("baseClean").value = cfg.demand.baseClean;
+
+    el("tipChance").value = cfg.tips.chance;
+    el("tipRate").value = cfg.tips.rate;
+    el("boosterLimit").value = cfg.tips.boosterLimit;
+
+    // machines
+    const dm = el("devMachines");
+    dm.innerHTML = "";
+    cfg.machines.forEach((m, i) => {
+      const div = document.createElement("div");
+      div.className = "item";
+      div.innerHTML = `
+        <div>
+          <div class="name">${m.key}</div>
+          <div class="meta">clean +${Number(m.addClean).toFixed(0)} • cost $${Number(m.cost||0).toFixed(0)}</div>
+        </div>
+        <div class="actions">
+          <div class="field" style="padding:8px; width:120px;">
+            <label>+Clean</label>
+            <input data-mclean="${i}" type="number" step="1" min="0" value="${m.addClean}">
+          </div>
+          <div class="field" style="padding:8px; width:120px;">
+            <label>Cost</label>
+            <input data-mcost="${i}" type="number" step="1" min="0" value="${m.cost||0}">
+          </div>
+        </div>
+      `;
+      dm.appendChild(div);
+    });
+
+    dm.querySelectorAll("[data-mclean]").forEach(inp=>{
+      inp.addEventListener("input",(e)=>{
+        const i = Number(e.target.dataset.mclean);
+        cfg.machines[i].addClean = Math.max(0, Number(e.target.value)||0);
+      });
+    });
+    dm.querySelectorAll("[data-mcost]").forEach(inp=>{
+      inp.addEventListener("input",(e)=>{
+        const i = Number(e.target.dataset.mcost);
+        cfg.machines[i].cost = Math.max(0, Number(e.target.value)||0);
+      });
+    });
+
+    // ads
+    const da = el("devAds");
+    da.innerHTML = "";
+    cfg.ads.forEach((a,i)=>{
+      const div = document.createElement("div");
+      div.className="item";
+      const countPlaced = placed.filter(p=>p.kind==="ad" && p.id===a.id).length;
+      div.innerHTML = `
+        <div>
+          <div class="name">${a.name}</div>
+          <div class="meta">+${a.addCarsPerSec}/s (=${(a.addCarsPerSec*60).toFixed(1)}/min) • cost $${a.cost} • placed ${countPlaced}</div>
+        </div>
+        <div class="actions">
+          <div class="field" style="padding:8px; width:140px;">
+            <label>+cars/sec</label>
+            <input data-acars="${i}" type="number" step="0.0001" min="0" value="${a.addCarsPerSec}">
+          </div>
+          <div class="field" style="padding:8px; width:120px;">
+            <label>Cost</label>
+            <input data-acost="${i}" type="number" step="1" min="0" value="${a.cost}">
+          </div>
+        </div>
+      `;
+      da.appendChild(div);
+    });
+    da.querySelectorAll("[data-acars]").forEach(inp=>{
+      inp.addEventListener("input",(e)=>{
+        const i = Number(e.target.dataset.acars);
+        cfg.ads[i].addCarsPerSec = Math.max(0, Number(e.target.value)||0);
+        updateArrivalSchedule();
+        rebuildBuildBar();
+      });
+    });
+    da.querySelectorAll("[data-acost]").forEach(inp=>{
+      inp.addEventListener("input",(e)=>{
+        const i = Number(e.target.dataset.acost);
+        cfg.ads[i].cost = Math.max(0, Number(e.target.value)||0);
+        rebuildBuildBar();
+      });
+    });
+
+    // boosters
+    const db = el("devBoosters");
+    db.innerHTML = "";
+    cfg.tips.boosters.forEach((b,i)=>{
+      const placedN = placed.filter(p=>p.kind==="booster" && p.id===b.id).length;
+      const div = document.createElement("div");
+      div.className="item";
+      div.innerHTML = `
+        <div>
+          <div class="name">${b.tier} • ${b.name}</div>
+          <div class="meta">bonus +${b.bonus} • cost $${b.cost} • placed ${placedN}</div>
+        </div>
+        <div class="actions">
+          <div class="field" style="padding:8px; width:120px;">
+            <label>Bonus</label>
+            <input data-bonus="${i}" type="number" step="0.5" min="0" value="${b.bonus}">
+          </div>
+          <div class="field" style="padding:8px; width:120px;">
+            <label>Cost</label>
+            <input data-bcost="${i}" type="number" step="1" min="0" value="${b.cost}">
+          </div>
+        </div>
+      `;
+      db.appendChild(div);
+    });
+    db.querySelectorAll("[data-bonus]").forEach(inp=>{
+      inp.addEventListener("input",(e)=>{
+        const i = Number(e.target.dataset.bonus);
+        cfg.tips.boosters[i].bonus = Math.max(0, Number(e.target.value)||0);
+        rebuildBuildBar();
+      });
+    });
+    db.querySelectorAll("[data-bcost]").forEach(inp=>{
+      inp.addEventListener("input",(e)=>{
+        const i = Number(e.target.dataset.bcost);
+        cfg.tips.boosters[i].cost = Math.max(0, Number(e.target.value)||0);
+        rebuildBuildBar();
+      });
+    });
+  }
+
+  function openDev(open) {
+    el("devDrawer").style.display = open ? "block" : "none";
+    if (open) rebuildDev();
+  }
+
+  // ========= HUD =========
+  function updateHud() {
+    el("hudCash").textContent = fmtMoney(state.cash);
+    el("hudDpm").textContent = fmtMoney(dollarsPerMin(60));
+    el("hudLam").textContent = `${totalArrivalRate().toFixed(3)}/s`;
+    el("hudQueue").textContent = `${state.queue.length}/${Math.max(0,Math.floor(Number(cfg.demand.queueCap)||0))}`;
+    el("hudTipMult").textContent = `${tipMult().toFixed(2)}×`;
+    el("hudTime").textContent = `t=${state.t.toFixed(1)}s`;
+  }
+
+  // ========= Hint flash =========
+  let hintTimeout = null;
+  function flashHint(msg) {
+    const bar = el("hintBar");
+    bar.innerHTML = `<b>${msg}</b> <span style="opacity:0.8;">(click lanes / build items)</span>`;
+    clearTimeout(hintTimeout);
+    hintTimeout = setTimeout(()=> {
+      bar.innerHTML = `<b>Click</b> a lane to manage it. Use <b>Build</b> to place Ads and Tip Boosters on the plot grid.
+      Press <b>\`</b> to toggle Dev panel.`;
+    }, 2000);
+  }
+
+  // ========= Input =========
+  const mouse = {x:0,y:0};
+  canvas.addEventListener("mousemove",(e)=>{
+    const r = canvas.getBoundingClientRect();
+    mouse.x = e.clientX - r.left;
+    mouse.y = e.clientY - r.top;
+  });
+
+  canvas.addEventListener("click",(e)=>{
+    const L = getLayout();
+    const r = canvas.getBoundingClientRect();
+    const x = e.clientX - r.left;
+    const y = e.clientY - r.top;
+
+    // if build open and click on grid area
+    if (build.open) {
+      const g = screenToGrid(x,y,L);
+      if (g) {
+        const existing = placedAt(g.gx,g.gy);
+
+        // delete mode
+        if (build.deleteMode) {
+          if (existing) {
+            // optional refund: none (you can change if you want)
+            const idx = placed.findIndex(p=>p.x===g.gx && p.y===g.gy);
+            placed.splice(idx,1);
+            flashHint(`Deleted item.`);
+            updateArrivalSchedule();
+            rebuildDev();
+            updateHud();
+          } else {
+            flashHint(`Nothing to delete here.`);
+          }
+          return;
+        }
+
+        if (!build.selected) {
+          flashHint(`Select an item in Build bar first.`);
+          return;
+        }
+
+        if (existing) {
+          flashHint(`Spot occupied. Turn on Delete or pick an empty tile.`);
+          return;
+        }
+
+        if (build.selected.kind === "booster") {
+          const limit = Math.max(0, Number(cfg.tips.boosterLimit)||0);
+          if (placedBoosterCount() >= limit) {
+            flashHint(`Booster limit reached (${limit}). Delete one first.`);
+            return;
+          }
+        }
+
+        // buy
+        let cost = 0;
+        if (build.selected.kind === "ad") {
+          const a = cfg.ads.find(z=>z.id===build.selected.id);
+          cost = Math.max(0, Number(a?.cost||0));
+        } else {
+          const b = cfg.tips.boosters.find(z=>z.id===build.selected.id);
+          cost = Math.max(0, Number(b?.cost||0));
+        }
+
+        if (state.cash < cost) {
+          flashHint(`Not enough cash. Need $${cost}.`);
+          return;
+        }
+        state.cash -= cost;
+
+        placed.push({kind:build.selected.kind, id:build.selected.id, x:g.gx, y:g.gy});
+        flashHint(`Placed ${build.selected.kind.toUpperCase()} (${build.selected.id}).`);
+        updateArrivalSchedule();
+        rebuildDev();
+        updateHud();
+        return;
+      }
+    }
+
+    // otherwise: lane click?
+    for (let i=0;i<L.lanes.length;i++){
+      const lane = L.lanes[i];
+      if (x >= L.laneX0 && x <= L.laneX1 && y >= lane.y0 && y <= lane.y1) {
+        openLanePanel(i);
+        return;
+      }
+    }
+
+    // click empty closes lane panel
+    closeFloatingPanel();
+  });
+
+  // keyboard
+  window.addEventListener("keydown",(e)=>{
+    if (e.key === "`") {
+      const open = el("devDrawer").style.display !== "block";
+      openDev(open);
+    }
+    if (e.key === "Escape") {
+      openBuild(false);
+      closeFloatingPanel();
+      openDev(false);
+    }
+  });
+
+  // ========= Buttons =========
+  el("btnPlay").onclick = () => { state.running = true; updateHud(); };
+  el("btnPause").onclick = () => { state.running = false; updateHud(); };
+  el("btnReset").onclick = () => reset(true);
+
+  el("btnBuild").onclick = () => {
+    openBuild(true);
+    flashHint("Build mode: click grid tiles to place.");
+  };
+  el("btnClearBuild").onclick = () => openBuild(false);
+
+  el("btnDeleteMode").onclick = () => {
+    build.deleteMode = !build.deleteMode;
+    el("btnDeleteMode").textContent = `Delete: ${build.deleteMode ? "ON" : "OFF"}`;
+  };
+
+  el("btnDev").onclick = () => {
+    const open = el("devDrawer").style.display !== "block";
+    openDev(open);
+  };
+  el("btnDevClose").onclick = () => openDev(false);
+
+  // dev inputs
+  el("simSpeed").addEventListener("input", (e)=> cfg.sim.speed = Math.max(1, Math.floor(Number(e.target.value)||1)));
+  el("tickMs").addEventListener("input", (e)=> cfg.sim.tickMs = clamp(Math.floor(Number(e.target.value)||100), 20, 500));
+  el("arrivalMode").addEventListener("change",(e)=> { cfg.demand.arrivalMode = e.target.value; updateArrivalSchedule(); });
+
+  el("baseArrival").addEventListener("input",(e)=> { cfg.demand.baseArrival = Math.max(0, Number(e.target.value)||0); updateArrivalSchedule(); });
+  el("queueCap").addEventListener("input",(e)=> { cfg.demand.queueCap = Math.max(0, Math.floor(Number(e.target.value)||0)); if (state.queue.length>cfg.demand.queueCap) state.queue.length = cfg.demand.queueCap; });
+  el("baseClean").addEventListener("input",(e)=> { cfg.demand.baseClean = Math.max(0, Number(e.target.value)||0); });
+  el("tipChance").addEventListener("input",(e)=> { cfg.tips.chance = clamp(Number(e.target.value)||0, 0, 1); });
+  el("tipRate").addEventListener("input",(e)=> { cfg.tips.rate = Math.max(0, Number(e.target.value)||0); });
+  el("boosterLimit").addEventListener("input",(e)=> { cfg.tips.boosterLimit = Math.max(0, Math.floor(Number(e.target.value)||0)); });
+
+  el("btnExport").onclick = () => el("configBox").value = JSON.stringify(cfg, null, 2);
+  el("btnImport").onclick = () => {
+    try {
+      const obj = JSON.parse(el("configBox").value);
+      cfg = obj;
+      // Rebuild sim lanes to match cfg
+      state.lanes = cfg.lanes.map((l,i)=>({
+        id:i, carsPerMin:Number(l.carsPerMin)||5,
+        inService:null, remaining:0, busyTime:0, served:0
+      }));
+      rebuildBuildBar();
+      rebuildDev();
+      updateArrivalSchedule();
+      flashHint("Imported config (cash/time kept).");
+    } catch (err) {
+      flashHint("Invalid JSON.");
+    }
+  };
+  el("btnSave").onclick = () => { localStorage.setItem("cw_tycoon_cfg", JSON.stringify(cfg)); flashHint("Saved config."); };
+  el("btnLoad").onclick = () => {
+    const raw = localStorage.getItem("cw_tycoon_cfg");
+    if (!raw) return flashHint("No saved config found.");
+    cfg = JSON.parse(raw);
+    state.lanes = cfg.lanes.map((l,i)=>({
+      id:i, carsPerMin:Number(l.carsPerMin)||5,
+      inService:null, remaining:0, busyTime:0, served:0
+    }));
+    rebuildBuildBar();
+    rebuildDev();
+    updateArrivalSchedule();
+    flashHint("Loaded config.");
+  };
+
+  // ========= Reset =========
+  function reset(full=true) {
+    state.running = true;
+    state.t = 0;
+    state.nextArrivalT = Infinity;
+    state.carId = 0;
+    state.queue = [];
+    state.cash = Number(cfg.economy.startCash)||0;
+    state.cashClean = 0;
+    state.cashTips = 0;
+    state.served = 0;
+    state.missed = 0;
+    state.events = [];
+    state.vizCars.clear();
+
+    // reset placed world items
+    placed.length = 0;
+
+    // build sim lanes
+    state.lanes = cfg.lanes.map((l,i)=>({
+      id:i, carsPerMin:Number(l.carsPerMin)||5,
+      inService:null, remaining:0, busyTime:0, served:0
+    }));
+
+    updateArrivalSchedule();
+    updateHud();
+    closeFloatingPanel();
+    openBuild(false);
+    rebuildBuildBar();
+    rebuildDev();
+    flashHint("Reset. Build ads/boosters, click lanes to upgrade.");
+  }
+
+  // ========= Main Loop =========
+  let lastWall = now();
+  function loop() {
+    resizeCanvas(); // cheap enough; if you want, debounce this later
+    const L = getLayout();
+
+    const wall = now();
+    const wallDt = (wall - lastWall)/1000;
+    lastWall = wall;
+
+    const tickSec = (Number(cfg.sim.tickMs)||100)/1000;
+    const simSpeed = Math.max(1, Number(cfg.sim.speed)||1);
+    const advance = wallDt * simSpeed;
+
+    if (state.running) {
+      let rem = advance;
+      while (rem > 0) {
+        const step = Math.min(tickSec, rem);
+        state.t += step;
+        tick(step);
+        rem -= step;
+      }
+    }
+
+    updateVizTargets(L);
+    stepViz(wallDt, L);
+    draw(L);
+    updateHud();
+
+    requestAnimationFrame(loop);
+  }
+
+  // ========= Init =========
+  rebuildBuildBar();
+  reset(true);
+  requestAnimationFrame(loop);
+
+  alert("Click a lane to manage it. Use Build to place Ads and Tip Boosters on the plot grid.")
+  
+})();
+</script>
+</body>
+</html>
