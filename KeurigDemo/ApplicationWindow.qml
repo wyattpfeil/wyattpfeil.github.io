@@ -16,6 +16,8 @@ Rectangle {
   property string selectedState: selectedSize === 0 ? "small..."
                           : selectedSize === 1 ? "medium..."
                           : "large..."
+  property var now: new Date()
+
 
   function startBrew() {
     progress = 0
@@ -48,6 +50,29 @@ Rectangle {
     }
   }
 
+        property string timeText: ""
+
+        function pad(n) { return (n < 10 ? "0" : "") + n }
+
+        function updateTime() {
+        var d = new Date()
+        var h = d.getHours()
+        var m = d.getMinutes()
+        var ampm = (h >= 12) ? "PM" : "AM"
+        h = h % 12
+        if (h === 0) h = 12
+        timeText = h + ":" + pad(m) + " " + ampm
+        }
+
+        Component.onCompleted: updateTime()
+
+        Timer {
+                interval: 1000
+                running: true
+                repeat: true
+                onTriggered: updateTime()
+        }
+
   // background image
   Image {
     anchors.fill: parent
@@ -61,7 +86,7 @@ Rectangle {
     visible: !root.brewing && !root.done
 
     Text {
-        text: "Good Morning, Wyatt"
+        text: "Good Afternoon, Wyatt"
         color: "white"
         font.pixelSize: 34
         font.family: poppinsLight.name;
@@ -74,9 +99,9 @@ Rectangle {
    }
 
    Text {
-        text: "12:30 pm"
+        text: root.timeText
         color: "white"
-        font.pixelSize: 64
+        font.pixelSize: 60
         font.family: poppinsLight.name;
 
         x: 0

@@ -1,5 +1,4 @@
-console.log("QMLEngine:", typeof QmlWeb.QMLEngine); // should be "function"
-const engine = new QmlWeb.QMLEngine(document.getElementById("app")); // per docs: new QMLEngine(element)
+const engine = new QmlWeb.QMLEngine(document.getElementById("app"));
 engine.loadFile("./ApplicationWindow.qml");
 engine.start();
 
